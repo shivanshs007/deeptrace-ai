@@ -12,7 +12,7 @@ def _get_client():
 
 def _get_collection():
     client = _get_client()
-    return client.get_or_create_collection("autocrew_results")
+    return client.get_or_create_collection("DeepTrace AI_results")
 
 
 def store_result(task_id: str, input_task: str, final_output: str) -> None:

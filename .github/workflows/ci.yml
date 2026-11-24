@@ -1,4 +1,4 @@
-name: AutoCrew CI
+name: DeepTrace AI CI
 
 on:
   push:
@@ -13,9 +13,9 @@ jobs:
       postgres:
         image: postgres:15-alpine
         env:
-          POSTGRES_USER: autocrew
-          POSTGRES_PASSWORD: autocrew_secret
-          POSTGRES_DB: autocrew
+          POSTGRES_USER: DeepTrace AI
+          POSTGRES_PASSWORD: DeepTrace AI_secret
+          POSTGRES_DB: DeepTrace AI
         ports:
           - 5432:5432
         options: >-
@@ -34,7 +34,7 @@ jobs:
           --health-retries 5
 
     env:
-      POSTGRES_URL: postgresql://autocrew:autocrew_secret@localhost:5432/autocrew
+      POSTGRES_URL: postgresql://DeepTrace AI:DeepTrace AI_secret@localhost:5432/DeepTrace AI
       REDIS_URL: redis://localhost:6379
       OPENAI_API_KEY: sk-test-placeholder
 

@@ -1,4 +1,4 @@
-import ReactMarkdown from 'react-markdown';
+import ReactMarkdown from "react-markdown";
 
 interface Props {
   result: string | null;
@@ -12,11 +12,11 @@ export function ResultPanel({ result, isLoading }: Props) {
 
   const handleDownload = () => {
     if (!result) return;
-    const blob = new Blob([result], { type: 'text/plain' });
+    const blob = new Blob([result], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
-    a.download = 'autocrew-report.txt';
+    a.download = "DeepTrace AI-report.txt";
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -25,7 +25,10 @@ export function ResultPanel({ result, isLoading }: Props) {
     return (
       <div className="space-y-3 animate-pulse">
         {[...Array(6)].map((_, i) => (
-          <div key={i} className={`h-4 rounded bg-gray-800 ${i % 3 === 0 ? 'w-3/4' : 'w-full'}`} />
+          <div
+            key={i}
+            className={`h-4 rounded bg-gray-800 ${i % 3 === 0 ? "w-3/4" : "w-full"}`}
+          />
         ))}
       </div>
     );

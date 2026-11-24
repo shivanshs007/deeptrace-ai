@@ -51,7 +51,7 @@ async def _process_task_completed(event: dict) -> None:
         pass
 
 
-class AutoCrewConsumer:
+class DeepTrace AIConsumer:
     def __init__(self) -> None:
         bootstrap = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "kafka:9092")
         self._consumer = KafkaConsumer(
@@ -60,7 +60,7 @@ class AutoCrewConsumer:
             "task.completed",
             bootstrap_servers=bootstrap,
             value_deserializer=lambda v: json.loads(v.decode("utf-8")),
-            group_id="autocrew-consumer",
+            group_id="DeepTrace AI-consumer",
             auto_offset_reset="earliest",
         )
 

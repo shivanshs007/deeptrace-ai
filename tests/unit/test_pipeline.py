@@ -29,8 +29,8 @@ def test_kafka_producer_serializes():
     mock_producer = MagicMock()
 
     with patch("data.kafka_producer._get_producer", return_value=mock_producer):
-        from data.kafka_producer import AutoCrewProducer
-        producer = AutoCrewProducer()
+        from data.kafka_producer import DeepTrace AIProducer
+        producer = DeepTrace AIProducer()
         producer.publish_task_created("task-1", "Test input")
 
     mock_producer.send.assert_called_once()
@@ -44,8 +44,8 @@ def test_kafka_producer_agent_completed_serializes():
     mock_producer = MagicMock()
 
     with patch("data.kafka_producer._get_producer", return_value=mock_producer):
-        from data.kafka_producer import AutoCrewProducer
-        producer = AutoCrewProducer()
+        from data.kafka_producer import DeepTrace AIProducer
+        producer = DeepTrace AIProducer()
         producer.publish_agent_completed("task-1", "manager", 100, 1500)
 
     mock_producer.send.assert_called_once()

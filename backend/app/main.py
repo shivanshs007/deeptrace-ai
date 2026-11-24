@@ -19,7 +19,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     else:
         print("✅ OpenAI API key found")
 
-    print("🚀 AutoCrew backend ready")
+    print("🚀 DeepTrace AI backend ready")
     print("   API:    http://localhost:8000")
     print("   Docs:   http://localhost:8000/docs")
 
@@ -29,7 +29,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     await close_redis()
 
 
-app = FastAPI(title="AutoCrew API", version="0.1.0", lifespan=lifespan)
+app = FastAPI(title="DeepTrace AI API", version="0.1.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -47,4 +47,4 @@ app.include_router(ws.router)
 
 @app.get("/health")
 async def health() -> dict[str, str]:
-    return {"status": "ok", "service": "autocrew-backend"}
+    return {"status": "ok", "service": "DeepTrace AI-backend"}

@@ -30,9 +30,9 @@ async def _run_task(task_id: str, input_text: str) -> None:
     """Background task — runs the agent crew and updates DB on completion."""
     try:
         from agents.graph import run_crew
-        from data.kafka_producer import AutoCrewProducer
+        from data.kafka_producer import DeepTrace AIProducer
 
-        producer = AutoCrewProducer()
+        producer = DeepTrace AIProducer()
         final_state = await run_crew(task_id, input_text)
         metadata = final_state.get("metadata", {})
         statuses = final_state.get("agent_statuses", {})
@@ -118,8 +118,8 @@ async def create_task(body: CreateTaskRequest, background_tasks: BackgroundTasks
         )
 
     try:
-        from data.kafka_producer import AutoCrewProducer
-        AutoCrewProducer().publish_task_created(task_id=task_id, input_text=body.input_text)
+        from data.kafka_producer import DeepTrace AIProducer
+        DeepTrace AIProducer().publish_task_created(task_id=task_id, input_text=body.input_text)
     except Exception:
         pass
 

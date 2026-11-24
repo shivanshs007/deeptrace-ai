@@ -7,7 +7,7 @@ BASE_URL = "http://localhost:3000"
 
 def test_page_loads(page: Page):
     page.goto(BASE_URL)
-    expect(page).to_have_title("AutoCrew — AI Research Platform")
+    expect(page).to_have_title("DeepTrace AI — AI Research Platform")
 
 
 def test_task_input_visible(page: Page):

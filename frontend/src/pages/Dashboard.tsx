@@ -1,20 +1,21 @@
-import { useState } from 'react';
-import { createTask } from '../api/client';
-import { useWebSocket } from '../hooks/useWebSocket';
-import { AgentCard } from '../components/AgentCard';
-import { TaskInput } from '../components/TaskInput';
-import { ResultPanel } from '../components/ResultPanel';
-import { MetricsBar } from '../components/MetricsBar';
+import { useState } from "react";
+import { createTask } from "../api/client";
+import { useWebSocket } from "../hooks/useWebSocket";
+import { AgentCard } from "../components/AgentCard";
+import { TaskInput } from "../components/TaskInput";
+import { ResultPanel } from "../components/ResultPanel";
+import { MetricsBar } from "../components/MetricsBar";
 
 export function Dashboard() {
   const [taskId, setTaskId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const { agents, finalOutput, isConnected, totalTokens, totalDurationMs } = useWebSocket(taskId);
+  const { agents, finalOutput, isConnected, totalTokens, totalDurationMs } =
+    useWebSocket(taskId);
 
   const isRunning = isSubmitting || (taskId !== null && finalOutput === null);
-  const doneCount = agents.filter(a => a.status === 'done').length;
+  const doneCount = agents.filter((a) => a.status === "done").length;
 
   const handleSubmit = async (text: string) => {
     setError(null);
@@ -24,7 +25,7 @@ export function Dashboard() {
       const { task_id } = await createTask(text);
       setTaskId(task_id);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to create task');
+      setError(e instanceof Error ? e.message : "Failed to create task");
     } finally {
       setIsSubmitting(false);
     }
@@ -35,12 +36,18 @@ export function Dashboard() {
       {/* Header */}
       <header className="border-b border-gray-800 px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <span className="text-2xl font-bold font-mono text-[#00FF9D]">AutoCrew</span>
-          <span className="text-xs text-gray-500 font-mono">Multi-Agent AI Platform</span>
+          <span className="text-2xl font-bold font-mono text-[#00FF9D]">
+            DeepTrace AI
+          </span>
+          <span className="text-xs text-gray-500 font-mono">
+            Multi-Agent AI Platform
+          </span>
         </div>
         <div className="flex items-center gap-2 text-xs font-mono">
-          <span className={`w-2 h-2 rounded-full ${isConnected ? 'bg-[#00FF9D] animate-pulse' : 'bg-gray-600'}`} />
-          <span className="text-gray-400">{isConnected ? 'Live' : 'Idle'}</span>
+          <span
+            className={`w-2 h-2 rounded-full ${isConnected ? "bg-[#00FF9D] animate-pulse" : "bg-gray-600"}`}
+          />
+          <span className="text-gray-400">{isConnected ? "Live" : "Idle"}</span>
         </div>
       </header>
 
@@ -56,7 +63,7 @@ export function Dashboard() {
           )}
 
           <div className="space-y-3">
-            {agents.map(agent => (
+            {agents.map((agent) => (
               <AgentCard
                 key={agent.name}
                 emoji={agent.emoji}
@@ -81,9 +88,13 @@ export function Dashboard() {
         {/* RIGHT — Result */}
         <div className="flex-1 bg-[#0d1117] rounded-2xl border border-gray-700/50 p-6 overflow-y-auto max-h-[calc(100vh-140px)]">
           <div className="flex items-center gap-2 mb-6">
-            <span className="text-sm font-mono text-gray-400">Research Report</span>
+            <span className="text-sm font-mono text-gray-400">
+              Research Report
+            </span>
             {isRunning && !finalOutput && (
-              <span className="text-xs text-orange-400 font-mono animate-pulse">generating…</span>
+              <span className="text-xs text-orange-400 font-mono animate-pulse">
+                generating…
+              </span>
             )}
           </div>
           <ResultPanel result={finalOutput} isLoading={isRunning} />
