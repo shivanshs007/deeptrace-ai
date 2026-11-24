@@ -14,10 +14,10 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     await init_db()
     print("✅ PostgreSQL connected")
 
-    if not os.getenv("OPENAI_API_KEY"):
-        print("⚠️  WARNING: OPENAI_API_KEY not set — agents will fail")
+    if not os.getenv("GOOGLE_API_KEY"):
+        print("⚠️  WARNING: GOOGLE_API_KEY not set — agents will fail")
     else:
-        print("✅ OpenAI API key found")
+        print("✅ Google API key found")
 
     print("🚀 DeepTrace AI backend ready")
     print("   API:    http://localhost:8000")

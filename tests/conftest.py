@@ -1,3 +1,9 @@
+import os
+
+# Set test API key before agent modules are imported during collection.
+# Tests mock all LLM calls, so this key is never used for real requests.
+os.environ.setdefault("GOOGLE_API_KEY", "test-placeholder")
+
 import pytest
 from unittest.mock import AsyncMock, MagicMock
 
@@ -26,7 +32,7 @@ def sample_agent_state() -> AgentState:
 
 
 @pytest.fixture
-def mock_openai_response():
+def mock_llm_response():
     response = MagicMock()
     response.content = "Mock LLM output for testing"
     response.usage_metadata = {"total_tokens": 100}

@@ -9,7 +9,8 @@ class Settings(BaseSettings):
     kafka_bootstrap_servers: str = "localhost:9092"
     chroma_host: str = "localhost"
     chroma_port: int = 8000
-    openai_api_key: str = ""
+    google_api_key: str = ""
+    gemini_model: str = "gemini-2.0-flash"
 
 
 settings = Settings()

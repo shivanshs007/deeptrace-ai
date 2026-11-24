@@ -1,7 +1,8 @@
+import os
 import time
 from typing import Any
 
-from langchain_openai import ChatOpenAI
+from langchain_google_genai import ChatGoogleGenerativeAI
 
 from agents.state import AgentState
 
@@ -26,7 +27,12 @@ Analyze the research findings and produce:
 
 Be analytical, objective, and evidence-based. Back every claim with data from the research."""
 
-llm = ChatOpenAI(model="gpt-4o", temperature=0.3)
+llm = ChatGoogleGenerativeAI(
+    model=os.getenv("GEMINI_MODEL", "gemini-2.0-flash"),
+    google_api_key=os.getenv("GOOGLE_API_KEY"),
+    temperature=0.3,
+    convert_system_message_to_human=True,
+)
 
 
 async def analyst_node(state: AgentState) -> dict[str, Any]:

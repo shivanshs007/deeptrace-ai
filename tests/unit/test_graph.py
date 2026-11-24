@@ -25,7 +25,7 @@ async def test_full_pipeline_runs():
             with patch("agents.graph.analyst_node", _make_mock_node("analyst", "analysis_results", "Analysis")):
                 with patch("agents.graph.writer_node", _make_mock_node("writer", "final_output", "Final report")):
                     with patch("agents.graph.crew") as mock_crew:
-                        mock_crew.astream = AsyncMock(return_value=_fake_stream())
+                        mock_crew.astream = MagicMock(return_value=_fake_stream())
 
                         with patch("redis.asyncio.from_url"):
                             from agents.graph import run_crew

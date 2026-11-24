@@ -20,7 +20,7 @@ def _get_producer() -> _KafkaProducer:
     return _producer
 
 
-class DeepTrace AIProducer:
+class DeepTraceAIProducer:
     def publish_task_created(self, task_id: str, input_text: str, user_id: Optional[str] = None) -> None:
         event = TaskCreatedEvent(task_id=task_id, input_text=input_text, user_id=user_id)
         try:

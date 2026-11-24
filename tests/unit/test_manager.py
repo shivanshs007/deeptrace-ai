@@ -6,9 +6,9 @@ from agents.state import AgentState
 
 
 @pytest.mark.asyncio
-async def test_manager_returns_plan(sample_agent_state, mock_openai_response):
+async def test_manager_returns_plan(sample_agent_state, mock_llm_response):
     with patch("agents.manager_agent.llm") as mock_llm:
-        mock_llm.ainvoke = AsyncMock(return_value=mock_openai_response)
+        mock_llm.ainvoke = AsyncMock(return_value=mock_llm_response)
 
         result = await manager_node(sample_agent_state)
 
@@ -18,9 +18,9 @@ async def test_manager_returns_plan(sample_agent_state, mock_openai_response):
 
 
 @pytest.mark.asyncio
-async def test_manager_updates_status(sample_agent_state, mock_openai_response):
+async def test_manager_updates_status(sample_agent_state, mock_llm_response):
     with patch("agents.manager_agent.llm") as mock_llm:
-        mock_llm.ainvoke = AsyncMock(return_value=mock_openai_response)
+        mock_llm.ainvoke = AsyncMock(return_value=mock_llm_response)
 
         result = await manager_node(sample_agent_state)
 
@@ -28,9 +28,9 @@ async def test_manager_updates_status(sample_agent_state, mock_openai_response):
 
 
 @pytest.mark.asyncio
-async def test_manager_tracks_tokens(sample_agent_state, mock_openai_response):
+async def test_manager_tracks_tokens(sample_agent_state, mock_llm_response):
     with patch("agents.manager_agent.llm") as mock_llm:
-        mock_llm.ainvoke = AsyncMock(return_value=mock_openai_response)
+        mock_llm.ainvoke = AsyncMock(return_value=mock_llm_response)
 
         result = await manager_node(sample_agent_state)
 

@@ -1,6 +1,13 @@
 import os
 from datetime import datetime
 
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
+
+_embeddings = GoogleGenerativeAIEmbeddings(
+    model="models/gemini-embedding-001",
+    google_api_key=os.getenv("GOOGLE_API_KEY"),
+)
+
 
 def _get_client():
     import chromadb
@@ -18,14 +25,7 @@ def _get_collection():
 def store_result(task_id: str, input_task: str, final_output: str) -> None:
     """Store a completed task result in ChromaDB for future RAG retrieval."""
     try:
-        from openai import OpenAI
-
-        oai = OpenAI()
-        response = oai.embeddings.create(
-            model="text-embedding-3-small",
-            input=final_output[:8000],
-        )
-        embedding = response.data[0].embedding
+        embedding = _embeddings.embed_query(final_output[:8000])
 
         collection = _get_collection()
         collection.upsert(
@@ -45,14 +45,7 @@ def store_result(task_id: str, input_task: str, final_output: str) -> None:
 def search_similar(query: str, n_results: int = 3) -> list[dict]:
     """Search ChromaDB for similar past research results."""
     try:
-        from openai import OpenAI
-
-        oai = OpenAI()
-        response = oai.embeddings.create(
-            model="text-embedding-3-small",
-            input=query[:8000],
-        )
-        embedding = response.data[0].embedding
+        embedding = _embeddings.embed_query(query[:8000])
 
         collection = _get_collection()
         results = collection.query(

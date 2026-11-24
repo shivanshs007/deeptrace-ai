@@ -1,8 +1,9 @@
+import os
 import time
 from typing import Any
 
-from langchain_openai import ChatOpenAI
-from langchain.agents import create_react_agent, AgentExecutor
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_classic.agents import create_react_agent, AgentExecutor
 from langchain_core.prompts import PromptTemplate
 from langchain_core.callbacks.base import BaseCallbackHandler
 
@@ -47,7 +48,12 @@ Begin!
 Question: {input}
 Thought:{agent_scratchpad}""")
 
-llm = ChatOpenAI(model="gpt-4o", temperature=0.3)
+llm = ChatGoogleGenerativeAI(
+    model=os.getenv("GEMINI_MODEL", "gemini-2.0-flash"),
+    google_api_key=os.getenv("GOOGLE_API_KEY"),
+    temperature=0.3,
+    convert_system_message_to_human=True,
+)
 tools = [web_search]
 
 

@@ -1,4 +1,4 @@
-# AutoCrew — Multi-Agent AI Research Platform
+# DeepTrace AI — Multi-Agent AI Research Platform
 
 A production-grade multi-agent system that autonomously researches any topic using a pipeline of specialized AI agents. Submit a question, and four coordinated agents decompose it, search the web, analyze findings, and produce a structured report — all in real time.
 
@@ -6,7 +6,7 @@ A production-grade multi-agent system that autonomously researches any topic usi
 
 ## What It Does
 
-AutoCrew accepts a research question and routes it through four agents in sequence:
+DeepTrace AI accepts a research question and routes it through four agents in sequence:
 
 ```
 Manager → Research → Analyst → Writer
@@ -75,7 +75,7 @@ Results stream live to the dashboard via WebSocket as each agent completes.
 | Requirement | Version | Notes |
 |---|---|---|
 | Docker Desktop | 4.x+ | Must be running |
-| OpenAI API key | — | GPT-4o access required |
+| Google API key | — | Gemini access required |
 | Git | any | — |
 
 No Python or Node installation needed — everything runs inside Docker.
@@ -87,12 +87,12 @@ No Python or Node installation needed — everything runs inside Docker.
 ### 1. Clone and configure
 
 ```bash
-git clone https://github.com/your-username/AutoCrew.git
-cd AutoCrew
+git clone https://github.com/your-username/deeptrace-ai.git
+cd deeptrace-ai
 
 cp .env.example .env
-# Open .env and set your OpenAI API key:
-# OPENAI_API_KEY=sk-proj-...
+# Open .env and set your Google API key:
+# GOOGLE_API_KEY=your_gemini_api_key_here
 ```
 
 ### 2. Start all services
@@ -171,7 +171,7 @@ docker-compose exec backend bash
 ## Project Structure
 
 ```
-AutoCrew/
+deeptrace-ai/
 ├── agents/                     # All AI agent logic
 │   ├── state.py                # AgentState TypedDict (shared state)
 │   ├── graph.py                # LangGraph pipeline + Redis events
@@ -251,25 +251,25 @@ AutoCrew/
 ## The Four Agents Explained
 
 ### Manager Agent
-- **Model:** GPT-4o, temperature 0.3
+- **Model:** Google Gemini (configurable via `GEMINI_MODEL`), temperature 0.3
 - **Role:** Strategic decomposition. Takes the raw user query and produces a numbered research plan with 3-4 focused sub-questions and an approach strategy.
 - **Why it exists:** Without decomposition, a single LLM call produces shallow coverage. Breaking the topic forces thorough, structured research.
 
 ### Research Agent
-- **Model:** GPT-4o via ReAct loop (Reason + Act)
+- **Model:** Google Gemini via ReAct loop (Reason + Act)
 - **Role:** Executes web searches for each sub-question, observes results, reasons about what was found, and produces a comprehensive findings summary.
 - **Pattern:** ReAct (`create_react_agent` + `AgentExecutor`) — the agent alternates between Thought/Action/Observation steps until it has enough data for a Final Answer.
 - **Tool:** Custom `web_search` — POST to `https://html.duckduckgo.com/html/`, parse results with regex, strip HTML tags. Built this way because the `duckduckgo-search` library gets rate-limited inside Docker.
-- **Token tracking:** Custom `_TokenCounter(BaseCallbackHandler)` using `on_llm_end` — necessary because `get_openai_callback()` doesn't work in async LangChain contexts.
+- **Token tracking:** Custom `_TokenCounter(BaseCallbackHandler)` using `on_llm_end` — tracks `usage_metadata` from the LangChain response for accurate async token counting.
 - **RAG:** Before searching, queries ChromaDB for similar past research to provide as context.
 
 ### Analyst Agent
-- **Model:** GPT-4o, temperature 0.3
+- **Model:** Google Gemini (configurable via `GEMINI_MODEL`), temperature 0.3
 - **Role:** Reads the raw research output and structures it into: Key Insights, Patterns & Trends, Risks & Challenges, Opportunities, Data Points.
 - **Why separate from Research:** Separation of concerns — the researcher gathers data without editorializing; the analyst interprets without collecting.
 
 ### Writer Agent
-- **Model:** GPT-4o, temperature 0.3
+- **Model:** Google Gemini (configurable via `GEMINI_MODEL`), temperature 0.3
 - **Role:** Has access to all prior state (original task + plan + research + analysis) and writes a professional Markdown report with Executive Summary, Key Findings, Analysis, Risks, Recommendations, and Conclusion.
 - **Why last:** The writer needs the full picture before writing. This ordering ensures no section is synthesized from incomplete data.
 
@@ -302,12 +302,13 @@ Each agent receives the full state, adds its output fields, and returns a partia
 | Technology | Why |
 |---|---|
 | **LangGraph** | Explicit graph of agent nodes with typed shared state. More transparent and debuggable than AutoGen or CrewAI — you can see exactly what each agent receives and returns. |
+| **Google Gemini** | Fast, cost-effective, and high-quality LLM via `langchain-google-genai`. Configurable model via `GEMINI_MODEL` env var (defaults to `gemini-2.0-flash`). |
 | **FastAPI** | Async-first Python web framework. `BackgroundTasks` lets agent pipelines run without blocking the HTTP response. |
 | **Redis pub/sub** | Lowest-latency broadcast mechanism for streaming updates. Each agent completion publishes to `task:{id}`; the WebSocket handler subscribes and forwards to the browser instantly. |
 | **WebSocket** | Required for true real-time push. Long-polling would add 1-2s lag per update; SSE would work but WebSocket is bidirectional (future use). |
 | **Kafka** | Durable, replayable event log. Every task lifecycle event (`task.created`, `agent.completed`, `task.completed`) is persisted. Enables audit trails, analytics, and retry logic without touching the main app. |
 | **PostgreSQL** | Relational persistence for tasks. Stores status, agent outputs, and metadata. asyncpg gives non-blocking queries compatible with FastAPI's async loop. |
-| **ChromaDB** | Embedding-based vector store for RAG. When a new task comes in, similar past research is retrieved and injected into the Research agent's prompt — improving quality without extra API calls. |
+| **ChromaDB** | Embedding-based vector store for RAG. When a new task comes in, similar past research is retrieved and injected into the Research agent's prompt — improving quality without extra API calls. Embeddings are generated via Google's `gemini-embedding-001` model. |
 | **React + Vite + Tailwind** | Fast dev server, typed components, utility-first CSS. No heavy UI framework needed for a dashboard this size. |
 | **ReAct pattern** | Interleaved reasoning and acting. The Research agent explains its thinking before each search, making failures debuggable and outputs more reliable than a single-shot prompt. |
 
@@ -338,18 +339,21 @@ This is how you'd build dashboards, alerting, or replay logic in a real system.
 Copy `.env.example` to `.env` and fill in:
 
 ```env
-# Required — get from platform.openai.com
-OPENAI_API_KEY=sk-proj-...
+# Required — get from aistudio.google.com
+GOOGLE_API_KEY=your_gemini_api_key_here
+
+# Optional — override the default Gemini model
+GEMINI_MODEL=gemini-2.0-flash
 
 # Pre-configured for Docker Compose — do not change unless running outside Docker
-POSTGRES_URL=postgresql://autocrew:autocrew_secret@postgres:5432/autocrew
+POSTGRES_URL=postgresql://DeepTrace AI:DeepTrace AI_secret@postgres:5432/DeepTrace AI
 REDIS_URL=redis://redis:6379
 KAFKA_BOOTSTRAP_SERVERS=kafka:9092
 CHROMA_HOST=chromadb
 CHROMA_PORT=8000
 ```
 
-Only `OPENAI_API_KEY` needs to be set. All other values point to Docker Compose service names and work out of the box.
+Only `GOOGLE_API_KEY` needs to be set. All other values point to Docker Compose service names and work out of the box.
 
 ---
 
@@ -388,14 +392,14 @@ See [.github/workflows/ci.yml](.github/workflows/ci.yml).
 **Docker won't start / permission errors**
 Make sure Docker Desktop is running and you have file sharing enabled for the project directory.
 
-**`OPENAI_API_KEY` errors**
-Confirm `.env` exists (not just `.env.example`) and the key starts with `sk-`.
+**`GOOGLE_API_KEY` errors**
+Confirm `.env` exists (not just `.env.example`) and the key is valid. Get one from [Google AI Studio](https://aistudio.google.com/).
 
 **Backend rebuilds don't pick up new packages**
 Run `docker-compose build --no-cache backend` to bypass the layer cache after changing `requirements.txt`.
 
 **Research agent is slow (~30-60s)**
-This is normal. The ReAct loop makes multiple GPT-4o calls plus web requests. Token usage is displayed in the Metrics bar when it completes.
+This is normal. The ReAct loop makes multiple Gemini calls plus web requests. Token usage is displayed in the Metrics bar when it completes.
 
 **Kafka UI shows no topics**
 Topics are created on first use. Submit at least one task from the dashboard, then refresh Kafka UI.
@@ -404,7 +408,7 @@ Topics are created on first use. Submit at least one task from the dashboard, th
 
 ## Goals of This Project
 
-AutoCrew was built as a portfolio project to demonstrate:
+DeepTrace AI was built as a portfolio project to demonstrate:
 
 - **Multi-agent orchestration** — how specialized agents with narrow roles outperform a single general-purpose prompt
 - **Real-time event-driven architecture** — combining Redis pub/sub, WebSockets, and Kafka in a single coherent system
@@ -413,4 +417,4 @@ AutoCrew was built as a portfolio project to demonstrate:
 
 ---
 
-*Built with LangGraph, FastAPI, React, Kafka, Redis, PostgreSQL, and ChromaDB.*
+*Built with LangGraph, Google Gemini, FastAPI, React, Kafka, Redis, PostgreSQL, and ChromaDB.*

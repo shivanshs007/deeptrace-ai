@@ -36,7 +36,7 @@ jobs:
     env:
       POSTGRES_URL: postgresql://DeepTrace AI:DeepTrace AI_secret@localhost:5432/DeepTrace AI
       REDIS_URL: redis://localhost:6379
-      OPENAI_API_KEY: sk-test-placeholder
+      GOOGLE_API_KEY: test-placeholder
 
     steps:
       - uses: actions/checkout@v4
